@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { createParentMessageTool } from '../lib/tool.js'
+import { createParentMessageTool, createSubagentSendMessageTool } from '../lib/tool.js'
 
 function fakeCtx ({ parent, resolution } = {}) {
   const calls = []
@@ -35,6 +35,22 @@ function sender (parentId = 'session-parent') {
     id: 'session-child',
     session: { header: { id: 'session-child', parentSession: parentId } },
   }
+}
+
+function fakeSubagentCtx () {
+  const calls = []
+  const ctx = {
+    get (name) {
+      if (name !== 'subagents') return undefined
+      return {
+        async sendMessage (from, target, content, options) {
+          calls.push({ from, target, content, options })
+          return 'msg-1'
+        },
+      }
+    },
+  }
+  return { ctx, calls }
 }
 
 test('delivers to the live direct parent and flushes', async () => {
@@ -84,4 +100,27 @@ test('refuses an empty message', async () => {
   const { ctx } = fakeCtx()
   const tool = createParentMessageTool({ defineTool, ctx })
   await assert.rejects(tool.execute({ message: '   ' }, { agent: sender() }), /non-empty message/)
+})
+
+test('subagent_send_message delegates to ctx.subagents.sendMessage', async () => {
+  const { ctx, calls } = fakeSubagentCtx()
+  const tool = createSubagentSendMessageTool({ defineTool, ctx })
+  const parent = sender()
+  const value = await tool.execute({ agent_id: 'session-grandchild', message: 'keep going' }, { agent: parent })
+  assert.equal(tool.name, 'subagent_send_message')
+  assert.equal(value.messageId, 'msg-1')
+  assert.equal(calls.length, 1)
+  assert.equal(calls[0].from, parent)
+  assert.equal(calls[0].target, 'session-grandchild')
+  assert.deepEqual(calls[0].content, [{ type: 'text', text: 'keep going' }])
+  assert.ok(calls[0].options !== null && typeof calls[0].options === 'object')
+})
+
+test('subagent_send_message refuses empty target/message and missing service', async () => {
+  const { ctx } = fakeSubagentCtx()
+  const tool = createSubagentSendMessageTool({ defineTool, ctx })
+  await assert.rejects(tool.execute({ agent_id: '', message: 'x' }, { agent: sender() }), /non-empty agent_id/)
+  await assert.rejects(tool.execute({ agent_id: 'session-x', message: '  ' }, { agent: sender() }), /non-empty message/)
+  const noService = createSubagentSendMessageTool({ defineTool, ctx: { get: () => undefined } })
+  await assert.rejects(noService.execute({ agent_id: 'session-x', message: 'x' }, { agent: sender() }), /dsh-subagent service/)
 })

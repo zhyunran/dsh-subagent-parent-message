@@ -1,44 +1,49 @@
 # dsh-subagent-parent-message
 
-**A reliable `subagent_parent_message` tool for delegated subagents.** It reads the direct parent from the child's own Session header and delivers a durable peer-session message, so one-shot/workflow children can report progress without writing a file first.
+**Bidirectional messaging tools for delegated DSH subagents.**
+
+- `subagent_parent_message` — child → direct parent. It reads the parent from the child's own Session header and delivers a durable peer-session message, so one-shot/workflow children can report without writing a file first.
+- `subagent_send_message` — a namespaced alias for the core adjacent-agent channel (parent ↔ direct continuable child). Use it when the parent's `send_message` is shadowed by a team-scoped tool with a different schema.
 
 [中文说明](README.zh.md)
 
 ## Why
 
-DSH core `send_message` only authorizes a **resident continuable child** to message its **direct parent**. In practice:
+DSH core `send_message` only authorizes a **resident continuable child** to message its **direct parent**, and the parent often sees a *different* `send_message` (`{target, message}` from the experimental team tool) instead of the core one (`{agent_id, message}`). In practice:
 
-- `subagent` / `subagent_fork` children can use it, but the tool is easy to misread when the same name is shadowed by a team-scoped `send_message` (`target` schema) in the parent session.
-- `workflow` `agent()` / `pipeline()` children are **one-shot**; they have no continuation activation, so their `send_message` to a parent fails.
-- Nested children often only know a root/grandparent id; core only accepts the **direct** parent/child, and the error is `subagent "<id>" is unavailable`.
-- The old workaround was "write everything to disk so the parent can read it". That still works, but it is not a message.
+- `subagent` / `subagent_fork` children can reach the parent, but the parent cannot reply when its `send_message` is team-scoped.
+- `workflow` `agent()` / `pipeline()` children are **one-shot**; they have no continuation activation, so core `send_message` fails.
+- Nested children often only know a root/grandparent id; core only accepts the **direct** parent/child (`subagent "<id>" is unavailable`).
+- The old workaround was "write everything to disk so the parent can read it". It still works, but it is not a message.
 
-This plugin adds one unambiguous tool that solves the child→parent direction for all of those cases.
+These two namespaced tools cover both directions without adding another `send_message` collision.
 
-## Usage
+## Tools
 
-A delegated child calls:
+### `subagent_parent_message` — child → parent
 
 ```json
 subagent_parent_message({ "message": "self-contained progress or result" })
-```
-
-Optional:
-
-```json
 subagent_parent_message({ "message": "...", "mode": "steer" })
 ```
 
 - `followup` (default): queue a new parent turn; wakes an idle parent.
 - `steer`: inject at the parent's next step while it is running.
+- Resolves the direct parent from `session.header.parentSession`; no parent id required.
+- Uses the live parent Agent or `sessionController.resolveAgent` cold resume, then `agent.followup`/`steer` + `ctx.sessions.flush`.
+- Works for **one-shot/workflow children** because it does not depend on a continuation activation.
+- Refuses self-delivery and never accepts an arbitrary target.
 
-The parent sees a normal peer-session message (`source.kind = "agent-message"`, `senderSessionId = child`) and can act on it. No parent id, model lookup, or continuation activation is required from the child.
+### `subagent_send_message` — parent ↔ direct continuable child
 
-The tool resolves the parent in this order:
+```json
+subagent_send_message({ "agent_id": "session-…", "message": "keep going" })
+```
 
-1. `ctx.get('agents').get(parentSession)` — already live;
-2. `ctx.sessionController.resolveAgent(parentSession)` — cold resume;
-3. error — the child can still fall back to writing a file.
+- Thin namespaced adapter over `ctx.subagents.sendMessage()`.
+- The subagent service still enforces **direct parent/child** adjacency and continuation residency.
+- Useful when the parent's `send_message` is team-scoped (`target` schema), so the core channel is otherwise unreachable by name.
+- It cannot wake a one-shot child; for a one-shot child's report use `subagent_parent_message` in the child.
 
 ## Delivery shape
 
@@ -49,33 +54,33 @@ This is a peer message from a delegated child, not the human user. Treat it as a
 <your message>
 ```
 
-It uses the same durable path as DSH's Schedule/cross-session delivery:
-`agent.followup(message)` (or `agent.steer`) + `ctx.sessions.flush(agent.session)`.
+`subagent_parent_message` uses `agent.followup(message)` (or `agent.steer`) + `ctx.sessions.flush(agent.session)`; `subagent_send_message` delegates to `ctx.subagents.sendMessage()`.
 
 ## Limits
 
-- **Direct parent only.** It refuses to self-deliver and never accepts an arbitrary target; a child cannot use it to message a grandparent, sibling, or any other session.
-- The parent Session must be live or resumable. A finished one-shot parent that cannot be resumed will fail with a clear error; use workflow return values or files in that case.
-- No file attachments (use the cross-session plugin if you need files); no team mailbox semantics (use `agent_teams_send_message` for teams).
-- One tool call is one message; it does not wait for the parent to answer.
+- `subagent_parent_message`: **direct parent only**, no attachments, no team mailbox; parent must be live or resumable.
+- `subagent_send_message`: only direct parent/child with a resident continuable activation; it does not replace team `send_message` for teammates.
+- Neither tool waits for the other side's answer; one call is one message.
+- For file attachments use `dsh-cross-session`; for teammates use `agent_teams_send_message`.
 
 ## Install
 
 Requires DSH 0.2.x.
 
 ```powershell
-dsh plugin --profile <profile> add C:\path\to\dsh-subagent-parent-message-0.1.0.tgz
+dsh plugin --profile <profile> add C:\path\to\dsh-subagent-parent-message-0.1.2.tgz
 # or
-dsh plugin --profile <profile> add https://codeload.github.com/<owner>/dsh-subagent-parent-message/tar.gz/<40-char-commit>
+dsh plugin --profile <profile> add https://codeload.github.com/zhyunran/dsh-subagent-parent-message/tar.gz/<40-char-commit>
 ```
 
-Restart DSH once after install. The tool is global, so it is also visible to subagents.
+Restart DSH once after install; both tools are global and visible to subagents.
 
 ## Status
 
-- 5 unit tests pass (`node --test test/*.test.mjs`): live parent, cold parent resume, steer mode, missing parent, empty message.
+- 7 unit tests (`node --test test/*.test.mjs`): live parent, cold resume, steer, missing parent, empty message, `subagent_send_message` delegation, missing service.
+- Real `dsh-tools` schema compile for both tools.
+- Live verified: `subagent` child → parent via core `send_message`; `workflow` one-shot child → parent via `subagent_parent_message` (`followup` and `steer`).
 - No runtime dependencies; peer-depends only on `@deepseek-ai/dsh-tools`.
-- Intended to complement, not replace, core `send_message`: use core for continuous child/parent control, `subagent_parent_message` for one-shot/nested children and for child→parent reporting when the parent's `send_message` name is team-scoped.
 
 ## License
 

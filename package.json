@@ -1,7 +1,7 @@
 {
   "name": "dsh-subagent-parent-message",
-  "version": "0.1.1",
-  "description": "Give delegated subagents a reliable subagent_parent_message tool: it resolves the direct parent session and delivers a durable peer message, even for one-shot/workflow children.",
+  "version": "0.1.2",
+  "description": "Give delegated subagents bidirectional tools: subagent_parent_message (child to parent, works for one-shot/workflow children) and subagent_send_message (namespaced core adjacent-agent messaging for parent to child when send_message is team-scoped).",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
