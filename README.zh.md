@@ -1,11 +1,11 @@
 # dsh-subagent-parent-message
 
+[English](README.md) · **中文**
+
 **给被委派子 agent 的双向消息工具。**
 
 - `subagent_parent_message` —— 子 → 直接父。从子会话自己的 header 读直接父，走持久 peer-session 消息通道；一次性/workflow 子代理不必先落盘才能汇报。
 - `subagent_send_message` —— 核心 adjacent-agent 通道的带命名空间别名（父 ↔ 直接 continuable 子）。当父会话的 `send_message` 被 Team 版（`target` schema）覆盖时使用。
-
-[English](README.md)
 
 ## 为什么需要
 
