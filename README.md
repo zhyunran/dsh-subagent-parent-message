@@ -68,7 +68,7 @@ This is a peer message from a delegated child, not the human user. Treat it as a
 Requires DSH 0.2.x.
 
 ```powershell
-dsh plugin --profile <profile> add C:\path\to\dsh-subagent-parent-message-0.1.2.tgz
+dsh plugin --profile <profile> add C:\path\to\dsh-subagent-parent-message-0.1.3.tgz
 # or
 dsh plugin --profile <profile> add https://codeload.github.com/zhyunran/dsh-subagent-parent-message/tar.gz/<40-char-commit>
 ```
@@ -77,7 +77,7 @@ Restart DSH once after install; both tools are global and visible to subagents.
 
 ## Status
 
-- 7 unit tests (`node --test test/*.test.mjs`): live parent, cold resume, steer, missing parent, empty message, `subagent_send_message` delegation, missing service.
+- 8 unit tests (`node --test test/*.test.mjs`): live parent, cold resume, steer, missing parent, empty message, `subagent_send_message` delegation, missing service, and output-schema required placement.
 - Real `dsh-tools` schema compile for both tools.
 - Live verified: `subagent` child → parent via core `send_message`; `workflow` one-shot child → parent via `subagent_parent_message` (`followup` and `steer`).
 - No runtime dependencies; peer-depends only on `@deepseek-ai/dsh-tools`.

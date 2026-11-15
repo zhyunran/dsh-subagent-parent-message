@@ -124,3 +124,19 @@ test('subagent_send_message refuses empty target/message and missing service', a
   const noService = createSubagentSendMessageTool({ defineTool, ctx: { get: () => undefined } })
   await assert.rejects(noService.execute({ agent_id: 'session-x', message: 'x' }, { agent: sender() }), /dsh-subagent service/)
 })
+
+test('both output schemas use object-level required arrays, not property flags', () => {
+  const { ctx } = fakeCtx()
+  const tools = [
+    createParentMessageTool({ defineTool, ctx }),
+    createSubagentSendMessageTool({ defineTool, ctx }),
+  ]
+  for (const tool of tools) {
+    const schema = tool.output.schema
+    assert.equal(schema.type, 'object')
+    assert.ok(Array.isArray(schema.required))
+    for (const [name, property] of Object.entries(schema.properties)) {
+      assert.equal(property.required, undefined, `${tool.name}.${name} uses invalid output property required`)
+    }
+  }
+})

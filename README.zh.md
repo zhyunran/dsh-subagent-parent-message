@@ -68,7 +68,7 @@ This is a peer message from a delegated child, not the human user. Treat it as a
 需要 DSH 0.2.x。
 
 ```powershell
-dsh plugin --profile <profile> add C:\path\to\dsh-subagent-parent-message-0.1.2.tgz
+dsh plugin --profile <profile> add C:\path\to\dsh-subagent-parent-message-0.1.3.tgz
 # 或
 dsh plugin --profile <profile> add https://codeload.github.com/zhyunran/dsh-subagent-parent-message/tar.gz/<40位commit>
 ```
@@ -77,7 +77,7 @@ dsh plugin --profile <profile> add https://codeload.github.com/zhyunran/dsh-suba
 
 ## 状态
 
-- 7 个单元测试：live 父、冷恢复、steer、无父、空消息、`subagent_send_message` 委托、服务缺失。
+- 8 个单元测试：live 父、冷恢复、steer、无父、空消息、`subagent_send_message` 委托、服务缺失、输出 schema 的 required 位置。
 - 两个工具都通过真实 `dsh-tools` schema 编译器。
 - 真机验证：`subagent` 子 → 父核心通道；`workflow` one-shot 子 → 父 `subagent_parent_message`（followup 与 steer）。
 - 无运行时依赖；只 peer-depend `@deepseek-ai/dsh-tools`。
