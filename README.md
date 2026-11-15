@@ -1,11 +1,11 @@
 # dsh-subagent-parent-message
 
+**English** · [中文](README.zh.md)
+
 **Bidirectional messaging tools for delegated DSH subagents.**
 
 - `subagent_parent_message` — child → direct parent. It reads the parent from the child's own Session header and delivers a durable peer-session message, so one-shot/workflow children can report without writing a file first.
 - `subagent_send_message` — a namespaced alias for the core adjacent-agent channel (parent ↔ direct continuable child). Use it when the parent's `send_message` is shadowed by a team-scoped tool with a different schema.
-
-[中文说明](README.zh.md)
 
 ## Why
 
