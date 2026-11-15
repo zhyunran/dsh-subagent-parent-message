@@ -68,7 +68,7 @@ This is a peer message from a delegated child, not the human user. Treat it as a
 需要 DSH 0.2.x。
 
 ```powershell
-dsh plugin --profile <profile> add C:\path\to\dsh-subagent-parent-message-0.1.3.tgz
+dsh plugin --profile <profile> add C:\path\to\dsh-subagent-parent-message-0.1.4.tgz
 # 或
 dsh plugin --profile <profile> add https://codeload.github.com/zhyunran/dsh-subagent-parent-message/tar.gz/<40位commit>
 ```

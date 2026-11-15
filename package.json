@@ -1,6 +1,6 @@
 {
   "name": "dsh-subagent-parent-message",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Give delegated subagents bidirectional tools: subagent_parent_message (child to parent, works for one-shot/workflow children) and subagent_send_message (namespaced core adjacent-agent messaging for parent to child when send_message is team-scoped).",
   "type": "module",
   "main": "lib/index.js",
