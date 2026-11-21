@@ -1,45 +1,45 @@
 {
-  "name": "dsh-subagent-parent-message",
-  "version": "0.1.4",
-  "description": "Give delegated subagents bidirectional tools: subagent_parent_message (child to parent, works for one-shot/workflow children) and subagent_send_message (namespaced core adjacent-agent messaging for parent to child when send_message is team-scoped).",
-  "type": "module",
-  "main": "lib/index.js",
-  "exports": {
-    ".": "./lib/index.js",
-    "./package.json": "./package.json"
-  },
-  "files": [
-    "lib",
-    "cordis.patch.yml",
-    "README.md",
-    "README.zh.md",
-    "CHANGELOG.md",
-    "LICENSE"
-  ],
-  "keywords": [
-    "dsh",
-    "dsh-plugin",
-    "deepseek-harness",
-    "deepseek",
-    "subagent",
-    "parent",
-    "message"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/zhyunran/dsh-subagent-parent-message.git"
-  },
-  "homepage": "https://github.com/zhyunran/dsh-subagent-parent-message#readme",
-  "bugs": {
-    "url": "https://github.com/zhyunran/dsh-subagent-parent-message/issues"
-  },
-  "license": "MIT",
-  "peerDependencies": {
-    "@deepseek-ai/dsh-tools": ">=0.2.0-rc.1 <0.3.0"
-  },
-  "dsh": {
-    "bundle": {
-      "patch": "cordis.patch.yml"
-    }
-  }
+    "name":  "dsh-subagent-parent-message",
+    "version":  "0.1.4",
+    "description":  "Give delegated subagents bidirectional tools: subagent_parent_message (child to parent, works for one-shot/workflow children) and subagent_send_message (namespaced core adjacent-agent messaging for parent to child when send_message is team-scoped).",
+    "type":  "module",
+    "main":  "lib/index.js",
+    "exports":  {
+                    ".":  "./lib/index.js",
+                    "./package.json":  "./package.json"
+                },
+    "files":  [
+                  "lib",
+                  "cordis.patch.yml",
+                  "README.md",
+                  "CHANGELOG.md",
+                  "LICENSE",
+                  "README.en.md"
+              ],
+    "keywords":  [
+                     "dsh",
+                     "dsh-plugin",
+                     "deepseek-harness",
+                     "deepseek",
+                     "subagent",
+                     "parent",
+                     "message"
+                 ],
+    "repository":  {
+                       "type":  "git",
+                       "url":  "git+https://github.com/zhyunran/dsh-subagent-parent-message.git"
+                   },
+    "homepage":  "https://github.com/zhyunran/dsh-subagent-parent-message#readme",
+    "bugs":  {
+                 "url":  "https://github.com/zhyunran/dsh-subagent-parent-message/issues"
+             },
+    "license":  "MIT",
+    "peerDependencies":  {
+                             "@deepseek-ai/dsh-tools":  "\u003e=0.2.0-rc.1 \u003c0.3.0"
+                         },
+    "dsh":  {
+                "bundle":  {
+                               "patch":  "cordis.patch.yml"
+                           }
+            }
 }
