@@ -1,8 +1,6 @@
 # dsh-subagent-parent-message
 
-**中文** 路 [<kbd>English</kbd>](README.en.md)
-
-**中文** · [English](README.md)
+**中文** · [<kbd>English</kbd>](README.en.md)
 
 **给被委派子 agent 的双向消息工具。**
 
