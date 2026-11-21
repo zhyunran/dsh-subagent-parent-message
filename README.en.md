@@ -2,7 +2,6 @@
 
 **English** 路 [**涓枃**](README.md)
 
-**English** · [中文](README.zh.md)
 
 **Bidirectional messaging tools for delegated DSH subagents.**
 
