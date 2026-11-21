@@ -1,6 +1,6 @@
 # dsh-subagent-parent-message
 
-**English** 路 [**涓枃**](README.md)
+**English** 路 [<kbd>中文</kbd>](README.md)
 
 
 **Bidirectional messaging tools for delegated DSH subagents.**
